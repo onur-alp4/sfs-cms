@@ -1,0 +1,48 @@
+.navicon {
+  color: blue;
+  font-size: 60%;
+}
+
+#newC {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.newC-hover .MuiButton-startIcon {
+  transform: rotate(90deg);
+}
+
+.MuiButton-startIcon {
+  transition: transform 0.3s ease;
+}
+
+.addMenu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.contentlist > div {
+  background: #d5d2d2;
+  border: #ebe9e9 2px solid;
+}
+
+.contentlist a {
+  text-decoration: none;
+  color: steelblue;
+  display: flex;
+}
+
+.contentlist span {
+  margin: 10px;
+}
+
+form.new-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 20px auto;
+}

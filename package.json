@@ -1,0 +1,47 @@
+{
+  "name": "sfs-cms",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@editorjs/checklist": "^1.1.0",
+    "@editorjs/delimiter": "^1.1.0",
+    "@editorjs/editorjs": "^2.15.1",
+    "@editorjs/embed": "^2.2.1",
+    "@editorjs/header": "^2.3.1",
+    "@editorjs/image": "^2.3.3",
+    "@editorjs/list": "^1.4.0",
+    "@editorjs/marker": "^1.2.1",
+    "@editorjs/paragraph": "^2.6.0",
+    "@editorjs/quote": "^2.3.0",
+    "@editorjs/table": "^1.2.0",
+    "@editorjs/warning": "^1.1.1",
+    "@material-ui/core": "^4.5.1",
+    "@material-ui/icons": "^4.5.1",
+    "firebase": "^7.2.1",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

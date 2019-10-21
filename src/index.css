@@ -1,0 +1,16 @@
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.errbar {
+  background: #dc3545a6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

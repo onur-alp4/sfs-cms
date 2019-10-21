@@ -1,0 +1,103 @@
+.saving {
+  background-color: yellow !important;
+}
+
+.saved {
+  animation: saveBG 1s 1;
+}
+
+#l {
+  margin-left: 15px;
+  transition: all 1s ease;
+}
+
+#l > span {
+  margin: 0px 5px;
+  background: #dc3545;
+}
+
+#editor-route {
+  margin: 20px 0;
+}
+
+#editor-route > div {
+  width: inherit;
+}
+
+#editor-header > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#editor-area {
+  box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  margin: 30px 0;
+  overflow: hidden;
+}
+
+#editor-menu {
+  display: flex;
+  justify-content: space-between;
+}
+
+#opts > div > span {
+  margin: 5px 8px;
+}
+
+.cdx-marker {
+  background: rgb(245, 235, 111) !important;
+  padding: 3px 0;
+}
+
+.codex-editor {
+  padding-left: 50px;
+  padding-top: 10px;
+}
+
+.codex-editor__redactor {
+  padding-bottom: 150px !important;
+}
+
+#save {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+@media only screen and (min-width: 650px) and (max-width: 770px) {
+  .ce-toolbar > .ce-toolbar__content {
+    max-width: 530px;
+  }
+}
+
+@media only screen and (max-width: 420px) {
+  .codex-editor {
+    padding: 10px 20px;
+  }
+}
+
+@media only screen and (max-width: 560px) {
+  #opts {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@keyframes saveBG {
+  0% {
+    background: greenyellow;
+  }
+  20% {
+    background: yellow;
+  }
+  40% {
+    background: greenyellow;
+  }
+  80% {
+    background: greenyellow;
+  }
+  100% {
+    background: white;
+  }
+}

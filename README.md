@@ -1,4 +1,4 @@
-![SFS CMS Logo](https://sfs-cms.firebaseapp.com/static/media/logo.53d93032.png =250x250)
+![](https://sfs-cms.firebaseapp.com/static/media/logo.53d93032.png =250x250)
 
 # Super Fast & Simple Content Management System
 

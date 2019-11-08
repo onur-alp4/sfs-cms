@@ -39,7 +39,7 @@ import Check from "@material-ui/icons/Check";
 
 const db = firebase.firestore();
 const storage = firebase.storage().ref();
-const iRef = db.doc("web/pages");
+const navRef = db.doc("web/shared");
 
 class Editor extends Component {
   constructor(props) {
@@ -95,8 +95,8 @@ class Editor extends Component {
     clearInterval(this.interval);
   }
 
-  editorSave(isFirstSave, status) {
-    var { isNavElem, url, navChange, name } = this.state;
+  editorSave() {
+    var { isNavElem, url, navChange, name, status } = this.state;
     const docRef = db.doc(
       `web/pages/${status === "publish" ? "publish" : "others"}/${url}`
     );
@@ -115,18 +115,8 @@ class Editor extends Component {
             }
           }
         });
-
-        if (navChange && isFirstSave) {
-          var d = {};
-          d[status] = {};
-          d[status][url] = {
-            isNavElem: isNavElem
-          };
-          // eslint-disable-next-line
-          var write = iRef.set(d, { merge: true }).catch(err => {});
-        }
-
-        saveData(docRef, outputData, isNavElem, name)
+        console.log("111111", status);
+        saveData(docRef, outputData, isNavElem, name, url, status)
           .then(() => {
             saveStatus = "saved";
             setTimeout(() => {
@@ -134,6 +124,13 @@ class Editor extends Component {
             }, 1000);
           })
           .then(() => {
+            // add controller to update only if new or oldStatus was 'published'
+            if (navChange === true) {
+              //eslint-disable-next-line
+              let navUpdateBeacon = navRef.update({
+                shouldUpdateNav: navChange
+              });
+            }
             imgDel(imgsToDel, url);
           })
           .then(() => {
@@ -153,27 +150,34 @@ class Editor extends Component {
   }
 
   handleStatusChange(newStatus) {
-    var { status, url, isNavElem, name } = this.state;
+    var { status, url } = this.state;
     var docRef = db.doc(
       `web/pages/${status === "publish" ? "publish" : "others"}/${url}`
     );
-    updateIndex(status, url, name, newStatus, isNavElem).then(s => {
-      if (s === "updated") {
-        if (newStatus === "delete") {
-          docDel(docRef).then(() => {
-            imgDel(this.usedImgs, url);
-            localStorage.removeItem("status");
-            window.location.assign("content");
-          });
-        } else {
-          docDel(docRef).then(() => {
-            localStorage.setItem("status", newStatus);
-            this.setState({ status: newStatus });
-            this.editorSave(false, newStatus);
-          });
-        }
-      }
-    });
+
+    if (
+      status === "publish" ||
+      (newStatus === "publish" && status !== newStatus)
+    ) {
+      //eslint-disable-next-line
+      let navUpdateBeacon = navRef.update({
+        shouldUpdateNav: true
+      });
+    }
+
+    if (newStatus === "delete") {
+      docDel(docRef).then(() => {
+        imgDel(this.usedImgs, url);
+        localStorage.removeItem("status");
+        window.location.assign("content");
+      });
+    } else {
+      docDel(docRef).then(() => {
+        localStorage.setItem("status", newStatus);
+        this.setState({ status: newStatus });
+        this.editorSave(newStatus);
+      });
+    }
   }
 
   render() {
@@ -193,9 +197,7 @@ class Editor extends Component {
               {/* {url && status && `${statusName} - ${slashReplacer(url, true)}`} */}
               {url && status && (
                 <Paper elevation={1} style={{ padding: "8px 15px" }}>
-                  <Breadcrumbs
-                    separator={<NavigateNext fontSize="small" />}
-                  >
+                  <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
                     <Typography variant="body2">{statusName}</Typography>
                     <Typography variant="body2">
                       {slashReplacer(url, true)}
@@ -297,8 +299,8 @@ class Editor extends Component {
               variant="contained"
               className={this.state.saveStatus}
               style={{ marginTop: 10, marginRight: 0 }}
-              onClick={e => {
-                this.editorSave(true, this.state.status);
+              onClick={() => {
+                this.editorSave();
               }}
               endIcon={<Save />}
             >
@@ -368,38 +370,19 @@ const newEditor = (data, url, t) => {
   return editor;
 };
 
-const saveData = async (docRef, data, isNavElem, name) => {
+const saveData = async (docRef, data, isNavElem, name, url, status) => {
+  console.log("222222", status);
   // eslint-disable-next-line
-  var update = docRef.set({ data, isNavElem, name }, { merge: true });
+  var update = docRef.set(
+    { data, isNavElem, name, url, status },
+    { merge: true }
+  );
 };
 
-const updateIndex = async (status, url, name, newStatus, isNavElem) => {
-  let d = {};
-  d[newStatus] = {};
-  d[newStatus][url] = {
-    name: name,
-    isNavElem: isNavElem,
-    oldStatus: status,
-    timeChanged: Date.now()
-  };
-
-  let z = iDelFunc(status, url);
-  let a = await z(iRef, db)
-    .then(s => {
-      if (s === "deleted") {
-        iRef.set(d, { merge: true });
-        return "updated";
-      } else {
-        return s;
-      }
-    })
-    .catch(e => {
-      console.log(e);
-    });
-  return a;
-};
+// delete
 
 const docDel = async (docRef, imgArr, url) => {
+  console.log(docRef)
   var q = await docRef
     .delete()
     .then(() => {
@@ -409,15 +392,6 @@ const docDel = async (docRef, imgArr, url) => {
       console.log(e);
     });
   return q;
-};
-
-const iDelFunc = (status, url) => {
-  // eslint-disable-next-line
-  var f = new Function(
-    "iRef, db",
-    `var q = iRef.update({ "${status}.${url}": db.app.firebase_.firestore.FieldValue.delete() }).then(() => {return 'deleted'}).catch((e) => {return e}); return q`
-  );
-  return f;
 };
 
 const fileUploader = async (f, url, t) => {

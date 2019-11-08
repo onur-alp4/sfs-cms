@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import firebase from "../../firebase.js";
 import { slashReplacer } from "./helperFuncs/common";
 import "./content.css";
@@ -36,9 +37,17 @@ class Content extends Component {
   }
 
   componentDidMount() {
-    getPages().then(d => {
-      let { editing, archive, publish } = d === undefined ? [] : d;
-      this.setState({ editing, archive, publish });
+    // getPages().then(d => {
+    //   let { editing, archive, publish } = d === undefined ? [] : d;
+    //   this.setState({ editing, archive, publish });
+    // });
+    listReq("all").then(d => {
+      console.log(d);
+      var obj = {};
+      d.data.forEach(e => {
+        obj[e.name] = e.data;
+      });
+      this.setState({ ...obj });
     });
   }
 
@@ -52,28 +61,26 @@ class Content extends Component {
       status: "editing"
     };
 
-    if (this.state.cname.length > 0 && this.state.curl > 0) {
-      console.log(this.state.cname)
-      console.log('curl', this.state.curl)
-      setPageIndex(this[objN], this)
+    if (this.state.cname.length > 0 && this.state.curl.length > 0) {
+      console.log(this.state.cname);
+      console.log("curl", this.state.curl);
+      const ref = db.doc(`web/pages/others/${this[objN].url}`);
+      ref
+        .set({
+          data: {},
+          isNavElem: false,
+          name: this[objN].name
+        })
         .then(() => {
-          const ref = db.doc(`web/pages/others/${this[objN].url}`);
-          ref
-            .set({
-              data: {},
-              isNavElem: false,
-              name: this[objN].name
-            })
-            .then(() => {
-              if (this.state.isExists === false) {
-                this.forward("editing", this[objN].url);
-              }
-            });
+          if (this.state.isExists === false) {
+            this.forward("editing", this[objN].url);
+          }
         })
         .catch(error => {
           console.log(error);
         });
     } else {
+      console.log(this.state.cname.length);
       this.setState({ newCErr: true });
     }
   }
@@ -160,8 +167,9 @@ class Content extends Component {
                     style={{ marginTop: 52, fontSize: 14, color: "#00000099" }}
                     variant="body1"
                   >
-                    <b>Content Name</b> is for your own records. Content Header
-                    will be set later.
+                    <b>Content Name</b> is for setting link's name. This name
+                    may be used in places such as page Title, Navigation link,
+                    Button name and etc.
                   </Typography>
                   <Typography
                     style={{ marginTop: 50, fontSize: 14, color: "#00000099" }}
@@ -253,71 +261,15 @@ class Content extends Component {
   }
 }
 
-const getPages = async () => {
-  const pagesRef = db.doc("web/pages");
-  var pages = await pagesRef
-    .get()
-    .then(doc => {
-      return doc.data();
-    })
-    .then(pages => {
-      var data = {};
-      for (var k in pages) {
-        data[k] = [];
-        for (var j in pages[k]) {
-          var d = {
-            name: pages[k][j].name,
-            url: j,
-            isNavElem: pages[k][j].isNavElem
-          };
-          data[k].push(d);
-        }
-      }
-      return data;
-    });
-  return pages;
-};
-
-const setPageIndex = async (o, t) => {
-  var d = {};
-  d[o.status] = {};
-  d[o.status][o.url] = {
-    name: o.name,
-    isNavElem: false
-  };
-
-  var data = getPages();
-  data
-    .then(d => {
-      var { editing, archive, publish } = d === undefined ? [] : d;
-      t.setState({ editing, archive, publish });
-    })
-    .then(() => {
-      var { editing, publish, archive } = t.state;
-      if (!Array.isArray(editing)) {
-        editing = [];
-      }
-      if (!Array.isArray(publish)) {
-        publish = [];
-      }
-      if (!Array.isArray(archive)) {
-        archive = [];
-      }
-      var allroutes = [...editing, ...publish, ...archive];
-      var isExists = allroutes.findIndex(e => {
-        return e.url === o.url;
-      });
-      if (isExists === -1) {
-        var write = db.doc("web/pages");
-
-        write.set(d, { merge: true }).catch(err => {
-          console.log(err);
-          t.setState({ newCErr: ["Name"] });
-        });
-      } else {
-        t.setState({ isExists: true });
-      }
-    });
-};
 
 export default Content;
+
+
+async function listReq(status) {
+  var data = await axios
+    .get(`https://sfs-cms.firebaseapp.com/api/cList?status=${status}`)
+    .then(d => {
+      return d;
+    });
+  return data;
+}

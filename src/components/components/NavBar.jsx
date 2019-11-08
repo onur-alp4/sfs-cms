@@ -41,7 +41,7 @@ function NavBar(props) {
         <Typography variant="h6" className={classes.title}>
           Content Manager
         </Typography>
-        <Button color="inherit">Login</Button>
+        <Button color="inherit">Logout</Button>
       </Toolbar>
     </AppBar>
   );
